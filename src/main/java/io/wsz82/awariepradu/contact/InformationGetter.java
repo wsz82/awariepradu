@@ -1,10 +1,13 @@
 package io.wsz82.awariepradu.contact;
 
+import io.wsz82.awariepradu.ScheduledUpdateTask;
 import io.wsz82.awariepradu.database.Notification;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -16,6 +19,8 @@ public class InformationGetter {
     private final static String[] WORDS_TO_REMOVE_FROM_LOCATION = makeWordsToRemove();
     private final static Map<String, String> WORDS_TO_REPLACE_IN_LOCATION = makeWordsToReplace();
     private final static int NUMBER_OF_REGIONS = 45;
+
+    private final Logger logger = LoggerFactory.getLogger(InformationGetter.class);
 
     private static String[] makeWordsToRemove() {
         return new String[]{"gmina wiejska", "obszar wiejski"};
@@ -77,7 +82,7 @@ public class InformationGetter {
             e.printStackTrace();
             notifications = null;
         }
-        System.out.println("Notifications: " + notifications);
+        logger.info("Notifications: " + notifications);
     }
 
     public List<Notification> getNotifications() {

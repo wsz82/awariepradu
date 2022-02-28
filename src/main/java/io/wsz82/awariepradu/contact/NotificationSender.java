@@ -1,6 +1,8 @@
 package io.wsz82.awariepradu.contact;
 
 import io.wsz82.awariepradu.Secrets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pl.smsapi.OAuthClient;
 import pl.smsapi.api.SmsFactory;
 import pl.smsapi.api.action.sms.SMSSend;
@@ -15,9 +17,11 @@ public class NotificationSender {
     private static final String PROXY_URL = "https://api.smsapi.pl/";
     private static final String SENDER_NAME = "AwariePradu";
 
+    private final Logger logger = LoggerFactory.getLogger(NotificationSender.class);
+
     private final boolean isTest;
     private final SmsFactory smsApi;
-    private String exception;
+    private String exceptionMessage;
 
     public NotificationSender(boolean isTest) throws Exception {
         this.isTest = isTest;
@@ -30,7 +34,7 @@ public class NotificationSender {
     public void sendToGroup(String groupName, String message) {
         SMSSend action = smsApi.actionSend()
                 .setGroup(groupName);
-        exception = null;
+        exceptionMessage = null;
         action.setTest(isTest)
                 .setText(message);
 //        if (!isTest) {
@@ -45,23 +49,23 @@ public class NotificationSender {
             }
 
             MessageResponse messageResponse = status.get();
-            System.out.println("Phone number: " + messageResponse.getNumber());
-            System.out.println("Shipment id: " + messageResponse.getId());
-            System.out.println("Shipment status: " + messageResponse.getStatus());
-            System.out.println("Error: " + messageResponse.getError());
-            System.out.println("Points: " + messageResponse.getPoints());
+            logger.info("Phone number: " + messageResponse.getNumber());
+            logger.info("Shipment id: " + messageResponse.getId());
+            logger.info("Shipment status: " + messageResponse.getStatus());
+            logger.info("Points: " + messageResponse.getPoints());
+            logger.error("Error: " + messageResponse.getError());
         } catch (SmsapiException e) {
-            exception = e.getMessage();
-            boolean isGroupNotFoundException = exception.contains("Groups not found");
+            exceptionMessage = e.getMessage();
+            boolean isGroupNotFoundException = exceptionMessage.contains("Groups not found");
             if (isGroupNotFoundException) {
-                System.out.println("Group not found: " + groupName);
+                logger.info("Group not found: " + groupName);
             } else {
-                System.out.println("Exception: " + exception);
+                logger.error("Exception: " + exceptionMessage);
             }
         }
     }
 
-    public String getException() {
-        return exception;
+    public String getExceptionMessage() {
+        return exceptionMessage;
     }
 }

@@ -1,5 +1,8 @@
 package io.wsz82.awariepradu.contact;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -10,6 +13,7 @@ import java.net.http.HttpResponse;
 import java.util.Optional;
 
 public class UpdateChecker {
+    private final Logger logger = LoggerFactory.getLogger(UpdateChecker.class);
 
     private final String lastUpdateLength;
 
@@ -19,7 +23,7 @@ public class UpdateChecker {
 
     public boolean isUpToDate() {
         String contentLength = requestContentLength();
-        System.out.println("Checked content length: " + contentLength);
+        logger.info("Checked content length: " + contentLength);
         return lastUpdateLength.equals(contentLength);
     }
 

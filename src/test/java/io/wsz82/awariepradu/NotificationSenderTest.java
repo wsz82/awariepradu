@@ -17,7 +17,7 @@ class NotificationSenderTest {
     void sendToGroup() throws Exception {
         NotificationSender sender = new NotificationSender(true);
         sender.sendToGroup(testGroup, testMessage);
-        String exception = sender.getException();
+        String exception = sender.getExceptionMessage();
 
         assertNull(exception);
     }

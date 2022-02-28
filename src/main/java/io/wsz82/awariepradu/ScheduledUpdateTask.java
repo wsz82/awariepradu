@@ -4,6 +4,8 @@ import io.wsz82.awariepradu.contact.InformationGetter;
 import io.wsz82.awariepradu.contact.NotificationSender;
 import io.wsz82.awariepradu.contact.UpdateChecker;
 import io.wsz82.awariepradu.database.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -13,6 +15,7 @@ import java.util.Optional;
 
 @Component
 public class ScheduledUpdateTask {
+    private final Logger logger = LoggerFactory.getLogger(ScheduledUpdateTask.class);
 
     @Autowired
     private AreaNotificationRepository areaNotificationRepository;
@@ -62,7 +65,7 @@ public class ScheduledUpdateTask {
                 String message = actual.areaMessage + " \n" + "Czas: " + actual.warningPeriod;
                 String groupName = actual.regionName + " - " + actual.areaName;
                 sender.sendToGroup(groupName, message);
-                System.out.println("Notified group: " + groupName);
+                logger.info("Notified group: " + groupName);
             }
         }
     }
@@ -78,7 +81,7 @@ public class ScheduledUpdateTask {
         } else {
             upToDate = false;
         }
-        System.out.println(upToDate ? "The database is up to date" : "The database isn't up to date");
+        logger.info(upToDate ? "The database is up to date" : "The database isn't up to date");
 
         return upToDate;
     }
