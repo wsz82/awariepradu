@@ -1,6 +1,5 @@
 package io.wsz82.awariepradu.contact;
 
-import io.wsz82.awariepradu.Secrets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.smsapi.OAuthClient;
@@ -25,7 +24,7 @@ public class NotificationSender {
 
     public NotificationSender(boolean isTest) throws Exception {
         this.isTest = isTest;
-        String oauthToken = Secrets.OAUTH_TOKEN;
+        String oauthToken = System.getenv("SMS_TOKEN");
         OAuthClient client = new OAuthClient(oauthToken);
         ProxyNative proxy = new ProxyNative(PROXY_URL);
         smsApi = new SmsFactory(client, proxy);
