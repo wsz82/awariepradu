@@ -82,7 +82,7 @@ public class InformationGetter {
             e.printStackTrace();
             notifications = null;
         }
-        logger.info("Notifications: " + notifications);
+        logger.info("Notifications size: " + (notifications == null ? "null" : notifications.size()));
     }
 
     public List<Notification> getNotifications() {
