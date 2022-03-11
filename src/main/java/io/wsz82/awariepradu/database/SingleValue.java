@@ -1,8 +1,16 @@
 package io.wsz82.awariepradu.database;
 
-import javax.persistence.*;
-import java.util.List;
+import lombok.*;
+import org.hibernate.Hibernate;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.util.Objects;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 
 @Entity
 public class SingleValue {
@@ -11,32 +19,4 @@ public class SingleValue {
 
         @Column
         public String value;
-
-        public SingleValue() {}
-
-        public SingleValue(int id, String value) {
-                this.id = id;
-                this.value = value;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                SingleValue that = (SingleValue) o;
-                return id == that.id && Objects.equals(value, that.value);
-        }
-
-        @Override
-        public int hashCode() {
-                return Objects.hash(id, value);
-        }
-
-        @Override
-        public String toString() {
-                return "SingleValue{" +
-                        "id=" + id +
-                        ", value='" + value + '\'' +
-                        '}';
-        }
 }

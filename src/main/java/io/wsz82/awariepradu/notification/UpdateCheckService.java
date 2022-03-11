@@ -1,5 +1,6 @@
-package io.wsz82.awariepradu.contact;
+package io.wsz82.awariepradu.notification;
 
+import io.wsz82.awariepradu.Misc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,14 +13,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 
-public class UpdateChecker {
-    private final Logger logger = LoggerFactory.getLogger(UpdateChecker.class);
+public class UpdateCheckService {
+    private final Logger logger = LoggerFactory.getLogger(UpdateCheckService.class);
 
-    private final String lastUpdateLength;
+    private String lastUpdateLength;
 
-    public UpdateChecker(String lastUpdateLength) {
-        this.lastUpdateLength = lastUpdateLength;
-    }
+    public UpdateCheckService() {}
 
     public boolean isUpToDate() {
         String contentLength = requestContentLength();
@@ -46,5 +45,9 @@ public class UpdateChecker {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public void setLastUpdateLength(String lastUpdateLength) {
+        this.lastUpdateLength = lastUpdateLength;
     }
 }

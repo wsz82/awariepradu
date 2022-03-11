@@ -1,6 +1,6 @@
-package io.wsz82.awariepradu.contact;
+package io.wsz82.awariepradu.notification;
 
-import io.wsz82.awariepradu.ScheduledUpdateTask;
+import io.wsz82.awariepradu.Misc;
 import io.wsz82.awariepradu.database.Notification;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,12 +15,17 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
 
-public class InformationGetter {
+public class InformationService {
+    private final static String[] WORDS_TO_REMOVE_FROM_REGION = makeWordsToRemoveFromRegion();
     private final static String[] WORDS_TO_REMOVE_FROM_LOCATION = makeWordsToRemove();
     private final static Map<String, String> WORDS_TO_REPLACE_IN_LOCATION = makeWordsToReplace();
     private final static int NUMBER_OF_REGIONS = 45;
 
-    private final Logger logger = LoggerFactory.getLogger(InformationGetter.class);
+    private final Logger logger = LoggerFactory.getLogger(InformationService.class);
+
+    private static String[] makeWordsToRemoveFromRegion() {
+        return new String[]{"Region "};
+    }
 
     private static String[] makeWordsToRemove() {
         return new String[]{"gmina wiejska", "obszar wiejski"};
@@ -35,7 +40,9 @@ public class InformationGetter {
     private List<Notification> notifications;
     private String contentLength;
 
-    public InformationGetter() {
+    public InformationService() {}
+
+    public void refreshNotifications() {
         notifications = new ArrayList<>(NUMBER_OF_REGIONS);
         try {
             HttpRequest request = HttpRequest.newBuilder()
@@ -56,6 +63,9 @@ public class InformationGetter {
             for (Element region : regions) {
                 Element regionName = region.select(".breakdown__region-name").first();
                 String regionNameText = regionName.text().trim();
+                for (String word : WORDS_TO_REMOVE_FROM_REGION) {
+                    regionNameText = regionNameText.replace(word, "");
+                }
 
                 Elements areas = region.select(".breakdown__area");
                 for (Element area : areas) {

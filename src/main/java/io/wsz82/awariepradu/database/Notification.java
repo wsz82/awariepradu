@@ -1,58 +1,39 @@
 package io.wsz82.awariepradu.database;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.Objects;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 
 @Entity
 @IdClass(NotificationKey.class)
 public class Notification {
         @Id
         @Column
-        public String regionName;
+        @NotBlank(message = "Region cannot be blank")
+        private String regionName;
 
         @Id
         @Column
-        public String areaName;
-
-        @Column(columnDefinition="text")
-        public String areaMessage;
+        @NotBlank(message = "Area cannot be blank")
+        private String areaName;
 
         @Column
-        public String warningPeriod;
+        @NotBlank(message = "Area message cannot be blank")
+        private String areaMessage;
 
-        public Notification() {}
-
-        public Notification(String regionName, String areaName, String areaMessage, String warningPeriod) {
-                this.regionName = regionName;
-                this.areaName = areaName;
-                this.areaMessage = areaMessage;
-                this.warningPeriod = warningPeriod;
-        }
+        @Column
+        @NotBlank(message = "Warning period cannot be blank")
+        private String warningPeriod;
 
         public boolean isTheSameArea(Notification that) {
                 return Objects.equals(regionName, that.regionName) && Objects.equals(areaName, that.areaName);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                Notification that = (Notification) o;
-                return Objects.equals(regionName, that.regionName) && Objects.equals(areaName, that.areaName) && Objects.equals(areaMessage, that.areaMessage) && Objects.equals(warningPeriod, that.warningPeriod);
-        }
-
-        @Override
-        public int hashCode() {
-                return Objects.hash(regionName, areaName, areaMessage, warningPeriod);
-        }
-
-        @Override
-        public String toString() {
-                return "AreaNotification{" +
-                        "regionName='" + regionName + '\'' +
-                        ", areaName='" + areaName + '\'' +
-                        ", areaMessage='" + areaMessage + '\'' +
-                        ", warningPeriod='" + warningPeriod + '\'' +
-                        '}';
         }
 }
