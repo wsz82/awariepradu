@@ -32,4 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 /src/main/resources/application.properties
-/src/main/java/io/wsz82/awariepradu/Secrets.java
+/src/main/resources/secrets.properties

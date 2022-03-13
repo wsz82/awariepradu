@@ -4,3 +4,6 @@
 .response {
     color: green;
 }
+.disabled {
+    color: darkgrey;
+}

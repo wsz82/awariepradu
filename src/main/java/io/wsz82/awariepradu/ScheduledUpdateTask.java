@@ -1,40 +1,65 @@
 package io.wsz82.awariepradu;
 
-import io.wsz82.awariepradu.notification.InformationService;
-import io.wsz82.awariepradu.notification.NotificationService;
-import io.wsz82.awariepradu.notification.UpdateCheckService;
-import io.wsz82.awariepradu.database.*;
+import io.wsz82.awariepradu.model.email.EmailService;
+import io.wsz82.awariepradu.model.information.InformationService;
+import io.wsz82.awariepradu.model.notification.AreaNotificationRepository;
+import io.wsz82.awariepradu.model.notification.Notification;
+import io.wsz82.awariepradu.model.notification.NotificationService;
+import io.wsz82.awariepradu.model.notification.UpdateCheckService;
+import io.wsz82.awariepradu.model.phonebook.PhonebookContact;
+import io.wsz82.awariepradu.model.singlevalue.SingleValue;
+import io.wsz82.awariepradu.model.singlevalue.SingleValueNumber;
+import io.wsz82.awariepradu.model.singlevalue.SingleValuesRepository;
+import io.wsz82.awariepradu.model.sms.SmsService;
+import io.wsz82.awariepradu.view.mail.NotificationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class ScheduledUpdateTask {
     private final Logger logger = LoggerFactory.getLogger(ScheduledUpdateTask.class);
 
     @Autowired
-    private ApplicationContext appContext;
+    SpringTemplateEngine templateEngine;
 
     @Autowired
-    private AreaNotificationRepository areaNotificationRepository;
+    InformationService informationService;
 
     @Autowired
-    private SingleValuesRepository singleValuesRepository;
+    NotificationService notificationService;
 
-    @Scheduled(fixedRate = 300000) //5 min
+    @Autowired
+    UpdateCheckService updateCheckService;
+
+    @Autowired
+    AreaNotificationRepository areaNotificationRepository;
+
+    @Autowired
+    SingleValuesRepository singleValuesRepository;
+
+    @Autowired
+    SmsService smsService;
+
+    @Autowired
+    EmailService emailService;
+
+    @Scheduled(fixedRate = 5, timeUnit = TimeUnit.MINUTES)
     public void runUpdate() {
         boolean databaseUpToDate = isDatabaseUpToDate();
         if (databaseUpToDate) {
             return;
         }
 
-        InformationService informationService = appContext.getBean(InformationService.class);
         informationService.refreshNotifications();
         List<Notification> lastNotifications = informationService.getNotifications();
 
@@ -53,31 +78,48 @@ public class ScheduledUpdateTask {
         singleValuesRepository.save(contentLengthValue);
     }
 
-    private void notifyGroups(List<Notification> lastNotifications, Iterable<Notification> previousNotifications) throws Exception {
-        NotificationService sender = appContext.getBean(NotificationService.class);
-        sender.refreshContacts();
+    private void notifyGroups(List<Notification> lastNotifications, Iterable<Notification> previousNotifications) {
+        Map<String, List<PhonebookContact>> contactGroups = notificationService.makeContactGroups();
 
         for (Notification actual : lastNotifications) {
-            final boolean[] canNotify = new boolean[] {true};
+            boolean canNotify = canNotify(previousNotifications, actual);
 
-            previousNotifications.forEach(previous -> {
-                if (previous.isTheSameArea(actual)) {
-                    if (previous.getAreaMessage().equals(actual.getAreaMessage()) &&
-                            previous.getWarningPeriod().equals(actual.getWarningPeriod())) {
-                        canNotify[0] = false;
-                    }
-                }
-            });
+            String location = actual.getRegionName() + " - " + actual.getAreaName();
 
-            if (canNotify[0]) {
-                String message = actual.getAreaMessage() + " \n" + "Czas: " + actual.getWarningPeriod();
-                String location = actual.getRegionName() + " - " + actual.getAreaName();
-                boolean isSent = sender.sendToLocation(location, message);
+            List<PhonebookContact> contacts = contactGroups.get(location);
+            if (contacts == null) {
+                logger.info("Location not found in contacts: " + location);
+                continue;
+            }
+
+            if (canNotify) {
+                String message = makeNotificationMessage(location, actual.getAreaMessage(), actual.getWarningPeriod());
+                boolean isSent = notificationService.sendToContacts(emailService, smsService, contacts, message);
                 if (isSent) {
                     logger.info("Notified location: " + location);
                 }
             }
         }
+    }
+
+    private boolean canNotify(Iterable<Notification> previousNotifications, Notification actual) {
+        for (Notification previous : previousNotifications) {
+            if (previous.isTheSameArea(actual)) {
+                if (previous.getAreaMessage().equals(actual.getAreaMessage()) &&
+                        previous.getWarningPeriod().equals(actual.getWarningPeriod())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private String makeNotificationMessage(String location, String message, String time) {
+        Context thymeleafContext = new Context();
+        NotificationDTO notificationDTO = new NotificationDTO(location, message, time);
+        Map<String, Object> variables = notificationDTO.getVariables();
+        thymeleafContext.setVariables(variables);
+        return templateEngine.process("notification.html", thymeleafContext);
     }
 
     private boolean isDatabaseUpToDate() {
@@ -90,7 +132,6 @@ public class ScheduledUpdateTask {
         }
 
         String lastUpdateLength = lastCheckedLengthOpt.get().value;
-        UpdateCheckService updateCheckService = appContext.getBean(UpdateCheckService.class);
         updateCheckService.setLastUpdateLength(lastUpdateLength);
         boolean upToDate = updateCheckService.isUpToDate();
         logger.info(upToDate ? "The database is up to date" : "The database isn't up to date");

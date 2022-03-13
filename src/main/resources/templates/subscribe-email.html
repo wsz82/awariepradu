@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pl"
+      xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <title>Title</title>
+</head>
+<body>
+Dzień dobry,<br>
+<br>
+Proszę o potwierdzenie aktywacji powiadomień o wyłączeniach prądu w rejonie grupy Energa:<br>
+Nr. telefonu: <b th:text="${contact.phoneNumber}"></b>, region: <b th:text="${contact.region}"></b>, gmina: <b
+        th:text="${contact.location}"></b><b th:text="${cityIndicator}"></b><br>
+<br>
+Kliknij link w celu aktywacji: <b><a th:href="${link}">link</a></b><br>
+Zignoruj, jeśli nie zapisywałeś się na powiadomienia.<br>
+<br>
+Z wyrazami szacunku,<br>
+Zespół AwariePradu
+</body>
+</html>

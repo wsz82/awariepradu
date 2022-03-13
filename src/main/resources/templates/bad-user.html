@@ -1,0 +1,14 @@
+<!DOCTYPE HTML>
+<html lang="pl"
+      xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Awarie prądu</title>
+    <link rel="stylesheet" th:href="@{/styles/main.css}"/>
+</head>
+<body>
+<p>Nieprawidłowy token:</p>
+<br>
+<div class="error" th:text="${tokenMessage}"></div>
+</body>
+</html>

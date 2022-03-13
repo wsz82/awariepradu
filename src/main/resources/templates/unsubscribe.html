@@ -4,23 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <title>Awarie prądu</title>
-    <link th:href="@{/styles/main.css}" rel="stylesheet" />
+    <link th:href="@{/styles/main.css}" rel="stylesheet"/>
 </head>
 <body>
-    <p>Wypisz się z powiadomień o planowanych wyłączeniach prądu w rejonie grupy Energa:</p>
-    <form action="#" th:action="@{/unsubscribe}" th:object="${contactUnsubscribe}" method="post">
-        <label for="phoneNumber">Nr. telefonu:</label><br>
-        <input type="tel" id="phoneNumber" th:field="*{phoneNumber}" name="formPhoneNumber">
-        <br>
-        <div class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
-        <br>
-        <input type="submit" value="Wypisz się">
-    </form>
-    <br>
-    <div class="response" th:text="${serverResponse}"></div>
-    <br>
-    <a href="#" th:href="@{index}">"Zapisz się"</a>
-    <br>
-    <img src="map.png" alt="Mapa">
+<h1>Wypisz się z powiadomień o planowanych wyłączeniach prądu w rejonie grupy Energa:</h1>
+<table>
+    <tr>
+        <td>
+            <form action="#" th:action="@{/unsubscribe}" th:object="${contactUnsubscribe}" method="post">
+
+                <label for="formEmail">Podaj adres e-mail:</label><br>
+                <input id="formEmail" name="formEmail" th:field="*{email}" type="tel">
+                <br>
+                <div class="error" th:errors="*{email}" th:if="${#fields.hasErrors('email')}"></div>
+                <br>
+
+                <input type="submit" value="Wypisz się">
+            </form>
+            <br>
+            <div class="response" th:text="${serverResponse}"></div>
+            <br>
+            <a href="#" th:href="@{index}">"Zapisz się"</a>
+            <br>
+        </td>
+        <td>
+            <img src="map.png" alt="Mapa">
+        </td>
+    </tr>
+</table>
 </body>
 </html>

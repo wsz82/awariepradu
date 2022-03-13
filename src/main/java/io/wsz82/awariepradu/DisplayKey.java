@@ -1,28 +1,56 @@
 package io.wsz82.awariepradu;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-
-import java.io.*;
 import java.util.Properties;
 
 public class DisplayKey {
-    private static final Properties properties = readProperties();
+    public static final String[] REGIONS = new String[]{
+            "Gdańsk",
+            "Gdynia",
+            "Kartuzy",
+            "Starogard Gdański",
+            "Tczew",
+            "Wejherowo",
+            "Jarocin",
+            "Kalisz",
+            "Kępno",
+            "Koło",
+            "Konin",
+            "Ostrów Wielkopolski",
+            "Słupca",
+            "Turek",
+            "Białogard",
+            "Bytów",
+            "Człuchów",
+            "Kołobrzeg",
+            "Koszalin",
+            "Lębork",
+            "Słupsk",
+            "Szczecinek",
+            "Braniewo",
+            "Elbląg",
+            "Iława",
+            "Kętrzyn",
+            "Kwidzyn",
+            "Lidzbark Warmiński",
+            "Ostróda",
+            "Szczytno",
+            "Ciechanów",
+            "Gostynin",
+            "Kutno",
+            "Mława",
+            "Płock",
+            "Płońsk",
+            "Sierpc",
+            "Brodnica",
+            "Grudziądz",
+            "Radziejów",
+            "Rypin",
+            "Toruń",
+            "Włocławek"
+    };
+    private static final Properties properties = Config.readProperties("display.properties");
 
-    private static Properties readProperties() {
-        ClassLoader classLoader = Application.class.getClassLoader();
-        String propertiesFilePath = classLoader.getResource("display.properties").getFile();
-        File propertiesFile = new File(propertiesFilePath);
-        Properties properties = new Properties();
-        try (Reader r = new FileReader(propertiesFile)) {
-            properties.load(r);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return properties;
-    }
-
-    public static String of(String key) {
-        return properties.get(key).toString();
+    public static String of(String key, Object... args) {
+        return properties.getProperty(key).formatted(args);
     }
 }

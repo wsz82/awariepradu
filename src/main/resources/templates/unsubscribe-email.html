@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pl"
+      xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <title>Title</title>
+</head>
+<body>
+Dzień dobry,<br>
+<br>
+Proszę o potwierdzenie rezygnacji z powiadomień o wyłączeniach prądu:<br>
+Nr. telefonu: <b th:text="${contact.phoneNumber}"></b><br>
+<br>
+Kliknij link w celu rezygnacji: <b><a th:href="${link}">link</a></b><br>
+Zignoruj, jeśli nie rezygnujesz z powiadomień.<br>
+<br>
+Z wyrazami szacunku,<br>
+Zespół AwariePradu
+</body>
+</html>

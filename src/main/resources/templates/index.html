@@ -4,44 +4,77 @@
 <head>
     <meta charset="UTF-8">
     <title>Awarie prądu</title>
-    <link th:href="@{/styles/main.css}" rel="stylesheet" />
+    <link th:href="@{/styles/main.css}" rel="stylesheet"/>
 </head>
 <body>
-    <p>Zapisz się na powiadomienia o planowanych wyłączeniach prądu w rejonie grupy Energa:</p>
-    <form action="#" th:action="@{/}" th:object="${contact}" method="post">
+<h1>Zapisz się na powiadomienia o planowanych wyłączeniach prądu w rejonie grupy Energa:</h1>
 
-        <label for="formPhoneNumber">Nr. telefonu:</label><br>
-        <input type="tel" id="formPhoneNumber" th:field="*{phoneNumber}" name="formPhoneNumber">
-        <br>
-        <div class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
-        <br>
+<table>
+    <tr>
+        <td>
+            <form action="#" th:action="@{/}" th:object="${contact}" method="post">
 
-        <label for="formRegion">Region:</label><br>
-        <select id="formRegion" th:field="*{region}">
-            <option th:each="regionName : ${T(io.wsz82.awariepradu.Misc).REGIONS}" th:value="${regionName}" th:text="${regionName}">
-            </option>
-        </select>
-        <br>
-        <br>
+                <fieldset>
+                    <label>Wybierz rodzaj powiadomień: </label>
+                    <br>
+                    <input type="radio" id="email" value="0" th:field="*{subscriptionType}" name="subscriptionType"
+                           checked>
+                    <label for="email">E-mail</label>
+                    <br>
+                    <input type="radio" id="sms" value="1" th:field="*{subscriptionType}" name="subscriptionType"
+                           disabled>
+                    <label class="disabled" for="sms">Sms</label>
+                    <br>
+                    <input type="radio" id="all" value="2" th:field="*{subscriptionType}" name="subscriptionType"
+                           disabled>
+                    <label class="disabled" for="all">E-mail i sms</label>
+                </fieldset>
+                <br>
 
-        <label for="formLocation">Gmina:</label><br>
-        <input type="text" id="formLocation" th:field="*{location}" name="formLocation">
-        <br>
-        <div class="error" th:if="${#fields.hasErrors('location')}" th:errors="*{location}"></div>
-        <br>
+                <label class="disabled" for="formPhoneNumber">Nr. telefonu:</label><br>
+                <input type="tel" id="formPhoneNumber" th:field="*{phoneNumber}" name="formPhoneNumber" disabled>
+                <br>
+                <div class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
+                <br>
 
-        <label for="formCity">Gmina miejska?</label>
-        <input type="checkbox" id="formCity" value="false" th:field="*{isCity}" name="formCity">
-        <br>
-        <br>
+                <label for="formEmail">Adres e-mail:</label><br>
+                <input id="formEmail" name="formEmail" th:field="*{email}" type="tel">
+                <br>
+                <div class="error" th:errors="*{email}" th:if="${#fields.hasErrors('email')}"></div>
+                <br>
 
-        <input type="submit" value="Zapisz się">
-    </form>
-    <br>
-    <div class="response" th:text="${serverResponse}"></div>
-    <br>
-    <a href="#" th:href="@{unsubscribe}">"Wypisz się"</a>
-    <br>
-    <img src="map.png" alt="Mapa">
+                <label for="formRegion">Region:</label><br>
+                <select id="formRegion" th:field="*{region}">
+                    <option th:each="regionName : ${T(io.wsz82.awariepradu.DisplayKey).REGIONS}" th:text="${regionName}"
+                            th:value="${regionName}">
+                    </option>
+                </select>
+                <br>
+                <br>
+
+                <label for="formLocation">Gmina:</label><br>
+                <input type="text" id="formLocation" th:field="*{location}" name="formLocation">
+                <br>
+                <div class="error" th:if="${#fields.hasErrors('location')}" th:errors="*{location}"></div>
+                <br>
+
+                <label for="formCity">Gmina miejska?</label>
+                <input type="checkbox" id="formCity" value="false" th:field="*{isCity}" name="formCity">
+                <br>
+                <br>
+
+                <input type="submit" value="Zapisz się">
+            </form>
+            <br>
+            <div class="response" th:text="${serverResponse}"></div>
+            <br>
+            <a href="#" th:href="@{unsubscribe}">"Wypisz się"</a>
+            <br>
+        </td>
+        <td>
+            <img src="map.png" alt="Mapa">
+        </td>
+    </tr>
+</table>
 </body>
 </html>
