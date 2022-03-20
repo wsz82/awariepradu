@@ -20,22 +20,27 @@
                     <input type="radio" id="email" value="0" th:field="*{subscriptionType}" name="subscriptionType"
                            checked>
                     <label for="email">E-mail</label>
-                    <br>
-                    <input type="radio" id="sms" value="1" th:field="*{subscriptionType}" name="subscriptionType"
-                           disabled>
-                    <label class="disabled" for="sms">Sms</label>
-                    <br>
-                    <input type="radio" id="all" value="2" th:field="*{subscriptionType}" name="subscriptionType"
-                           disabled>
-                    <label class="disabled" for="all">E-mail i sms</label>
+
+                    <span class="hidden">
+                        <br>
+                        <input type="radio" id="sms" value="1" th:field="*{subscriptionType}" name="subscriptionType"
+                               disabled>
+                        <label class="disabled" for="sms">Sms</label>
+                        <br>
+                        <input type="radio" id="all" value="2" th:field="*{subscriptionType}" name="subscriptionType"
+                               disabled>
+                        <label class="disabled" for="all">E-mail i sms</label>
+                    </span>
                 </fieldset>
                 <br>
 
-                <label class="disabled" for="formPhoneNumber">Nr. telefonu:</label><br>
-                <input type="tel" id="formPhoneNumber" th:field="*{phoneNumber}" name="formPhoneNumber" disabled>
-                <br>
-                <div class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
-                <br>
+                <span class="hidden">
+                    <label class="disabled" for="formPhoneNumber">Nr. telefonu:</label><br>
+                    <input type="tel" id="formPhoneNumber" th:field="*{phoneNumber}" name="formPhoneNumber" disabled>
+                    <br>
+                    <div class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
+                    <br>
+                </span>
 
                 <label for="formEmail">Adres e-mail:</label><br>
                 <input id="formEmail" name="formEmail" th:field="*{email}" type="tel">

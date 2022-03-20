@@ -7,3 +7,6 @@
 .disabled {
     color: darkgrey;
 }
+.hidden {
+    visibility: hidden;
+}

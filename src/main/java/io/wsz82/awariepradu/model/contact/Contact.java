@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.Objects;
 
 @Entity
@@ -28,9 +29,11 @@ public class Contact {
     private String phoneNumber;
 
     @NotBlank(message = "{Contact.Region.NotBlank}")
+    @Size(max = 30, message = "{Contact.Region.MaxSize}")
     private String region;
 
     @NotBlank(message = "{Contact.Location.NotBlank}")
+    @Size(max = 30, message = "{Contact.Location.MaxSize}")
     private String location;
 
     @NonNull
@@ -48,12 +51,12 @@ public class Contact {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Contact contact = (Contact) o;
-        return Objects.equals(phoneNumber, contact.phoneNumber);
+        return Objects.equals(email, contact.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(phoneNumber);
+        return Objects.hash(email);
     }
 
 }

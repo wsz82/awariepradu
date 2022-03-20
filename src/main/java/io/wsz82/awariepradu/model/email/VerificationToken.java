@@ -5,9 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Objects;
 
 @Setter
@@ -15,7 +12,7 @@ import java.util.Objects;
 
 @Entity
 public class VerificationToken {
-    private static final int EXPIRATION = 60 * 24;
+    private static final long EXPIRATION = 24*60*60*1000;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,23 +24,20 @@ public class VerificationToken {
     @JoinColumn(nullable = false, name = "email")
     private Contact contact;
 
-    private Date expiryDate;
+    private long expiryTimeMillis;
 
     public VerificationToken() {
-        this.expiryDate = calculateExpiryDate(EXPIRATION);
+        this.expiryTimeMillis = calculateExpiryMillis(EXPIRATION);
     }
 
     public VerificationToken(String token, Contact contact) {
         this.token = token;
         this.contact = contact;
-        this.expiryDate = calculateExpiryDate(EXPIRATION);
+        this.expiryTimeMillis = calculateExpiryMillis(EXPIRATION);
     }
 
-    private Date calculateExpiryDate(int expiryTimeInMinutes) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Timestamp(cal.getTime().getTime()));
-        cal.add(Calendar.MINUTE, expiryTimeInMinutes);
-        return new Date(cal.getTime().getTime());
+    private long calculateExpiryMillis(long expiryTimeLengthMillis) {
+        return System.currentTimeMillis() + expiryTimeLengthMillis;
     }
 
     @Override
@@ -64,7 +58,7 @@ public class VerificationToken {
         return "VerificationToken{" +
                 "id=" + id +
                 ", token='" + token + '\'' +
-                ", expiryDate=" + expiryDate +
+                ", expiryDate=" + expiryTimeMillis +
                 '}';
     }
 }

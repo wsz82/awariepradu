@@ -11,9 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -34,14 +32,12 @@ public class ScheduledCleanTokensTask {
     public void runUpdate() {
         logger.info("Started cleaning tokens and contacts tables");
 
-        long time = Calendar.getInstance().getTime().getTime();
+        long time = System.currentTimeMillis();
         List<VerificationToken> tokens = tokenRepository.findAll();
 
         List<VerificationToken> expiredTokens = tokens.stream()
                 .filter(t -> {
-                    Date expiryDate = t.getExpiryDate();
-                    if (expiryDate == null) return true;
-                    long expireTime = expiryDate.getTime();
+                    long expireTime = t.getExpiryTimeMillis();
                     return expireTime - time <= 0;
                 })
                 .toList();

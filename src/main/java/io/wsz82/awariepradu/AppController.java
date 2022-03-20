@@ -24,7 +24,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Calendar;
 
 @Controller
 public class AppController {
@@ -38,6 +37,9 @@ public class AppController {
     private static final String UNSUBSCRIBE_CONFIRM = "unsubscribe-confirm";
     private static final String SUBSCRIBE_CONFIRM = "subscribe-confirm";
     private static final String BAD_USER = "bad-user";
+
+    private static final long MILLIS_ONE_DAY = 24*60*60*1000;
+    private static final long MILLIS_5_MIN = 5*60*1000;
 
     private final Logger logger = LoggerFactory.getLogger(AppController.class);
 
@@ -68,6 +70,11 @@ public class AppController {
         String email = contact.getEmail();
         SubscriptionType subscriptionType = contact.parsedSubscriptionType();
 
+        if (subscriptionType == SubscriptionType.ALL || subscriptionType == SubscriptionType.PHONE) {
+            model.addAttribute(SERVER_RESPONSE, DisplayKey.of("Contact.Subscribe.Unavailable"));
+            return INDEX;
+        }
+
         if (email.isBlank()) {
             model.addAttribute(SERVER_RESPONSE, DisplayKey.of("Contact.Subscribe.AddEmail"));
             return INDEX;
@@ -76,6 +83,13 @@ public class AppController {
             model.addAttribute(SERVER_RESPONSE, DisplayKey.of("Contact.Subscribe.AddPhoneNumber"));
             return INDEX;
         }
+
+        boolean isAnyValidToken = isAnyValidToken(email);
+        if (isAnyValidToken) {
+            model.addAttribute(SERVER_RESPONSE, DisplayKey.of("Contact.Subscribe.TimeLimitExceeded"));
+            return INDEX;
+        }
+
         boolean contactExists = phonebookContactService.doContactExist(email);
         logger.info("Subscribe: do contact ({}) exist in phone book: {}", email, contactExists);
         if (contactExists) {
@@ -96,6 +110,17 @@ public class AppController {
         return INDEX;
     }
 
+    private boolean isAnyValidToken(String email) {
+        return verificationTokenRepository.findAll().stream()
+                .filter(t -> email.equals(t.getContact().getEmail()))
+                .map(VerificationToken::getExpiryTimeMillis)
+                .anyMatch(expireTimeMillis -> {
+                    long exceedTime = expireTimeMillis - MILLIS_ONE_DAY + MILLIS_5_MIN;
+                    long time = System.currentTimeMillis();
+                    return time < exceedTime;
+                });
+    }
+
     @GetMapping("/" + SUBSCRIBE_CONFIRM)
     public String subscribeConfirm(@RequestParam("token") String token, Model model) {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
@@ -105,8 +130,8 @@ public class AppController {
         }
 
         Contact contact = verificationToken.getContact();
-        long expireTime = verificationToken.getExpiryDate().getTime();
-        long time = Calendar.getInstance().getTime().getTime();
+        long expireTime = verificationToken.getExpiryTimeMillis();
+        long time = System.currentTimeMillis();
         if ((expireTime - time) <= 0) {
             model.addAttribute(TOKEN_MESSAGE, DisplayKey.of("Contact.Subscribe.Token.Expired"));
             return BAD_USER;
@@ -133,6 +158,13 @@ public class AppController {
         }
 
         String email = formContact.getEmail();
+
+        boolean isAnyValidToken = isAnyValidToken(email);
+        if (isAnyValidToken) {
+            model.addAttribute(SERVER_RESPONSE, DisplayKey.of("Contact.Subscribe.TimeLimitExceeded"));
+            return UNSUBSCRIBE;
+        }
+
         PhonebookContact phonebookContact = phonebookContactService.getContactByEmail(email);
         boolean contactExists = phonebookContact != null;
         logger.info("Unsubscribe: do contact exist in phone book: {}", contactExists);
@@ -158,8 +190,8 @@ public class AppController {
         }
 
         Contact contact = verificationToken.getContact();
-        long expireTime = verificationToken.getExpiryDate().getTime();
-        long time = Calendar.getInstance().getTime().getTime();
+        long expireTime = verificationToken.getExpiryTimeMillis();
+        long time = System.currentTimeMillis();
         if ((expireTime - time) <= 0) {
             model.addAttribute(TOKEN_MESSAGE, DisplayKey.of("Contact.Subscribe.Token.Expired"));
             return BAD_USER;
