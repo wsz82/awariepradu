@@ -13,6 +13,5 @@ public class FileResourceUtils {
         } else {
             return inputStream;
         }
-
     }
 }
